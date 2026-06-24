@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReviewSense AI Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="container dashboard">
+    <header class="topbar">
+      <div>
+        <h1>ReviewSense AI Dashboard</h1>
+        <p>Source file: {{ state.source_file or 'No file loaded yet' }}</p>
+      </div>
+      <div class="actions">
+        <a class="button secondary" href="{{ url_for('index') }}">Upload another</a>
+        {% if state.processed_file %}
+          <a class="button" href="{{ url_for('download') }}">Download enriched CSV</a>
+        {% endif %}
+      </div>
+    </header>
+
+    <section class="stats-grid">
+      <div class="stat"><span>Total</span><strong>{{ state.stats.total_reviews or 0 }}</strong></div>
+      <div class="stat"><span>Positive</span><strong>{{ state.stats.positive_reviews or 0 }}</strong></div>
+      <div class="stat"><span>Neutral</span><strong>{{ state.stats.neutral_reviews or 0 }}</strong></div>
+      <div class="stat"><span>Negative</span><strong>{{ state.stats.negative_reviews or 0 }}</strong></div>
+      <div class="stat"><span>Topics</span><strong>{{ state.stats.topic_count or 0 }}</strong></div>
+    </section>
+
+    <section class="card">
+      <h2>AI Summary</h2>
+      <pre class="summary">{{ state.summary or 'No summary available yet.' }}</pre>
+    </section>
+
+    <section class="chart-grid">
+      <div class="card chart">{{ state.charts.sentiment_html | safe }}</div>
+      <div class="card chart">{{ state.charts.topics_html | safe }}</div>
+      {% if state.charts.rating_html %}
+        <div class="card chart">{{ state.charts.rating_html | safe }}</div>
+      {% endif %}
+    </section>
+
+    <section class="card">
+      <h2>Word Cloud</h2>
+      {% if state.wordcloud %}
+        <img class="wordcloud" src="data:image/png;base64,{{ state.wordcloud }}" alt="Word cloud">
+      {% else %}
+        <p>No word cloud available.</p>
+      {% endif %}
+    </section>
+
+    <section class="card">
+      <h2>Topic Keywords</h2>
+      <div class="topic-list">
+        {% for topic_id, words in state.topics.items() %}
+          <div class="topic-item">
+            <strong>Topic {{ topic_id + 1 }}</strong>
+            <p>{{ words | join(', ') }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Enriched Rows Preview</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              {% if state.rows %}
+                {% for key in state.rows[0].keys() %}
+                  <th>{{ key }}</th>
+                {% endfor %}
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in state.rows[:20] %}
+              <tr>
+                {% for value in row.values() %}
+                  <td>{{ value }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

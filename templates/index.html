@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReviewSense AI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>ReviewSense AI</h1>
+      <p>Upload a CSV review dataset and get sentiment, topics, and an AI summary.</p>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <section class="card">
+      <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+        <label for="file">CSV file</label>
+        <input type="file" id="file" name="file" accept=".csv" required>
+        <button type="submit">Analyze reviews</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Expected CSV columns</h2>
+      <p>ReviewSense AI auto-detects review text columns such as review, reviews, text, comment, feedback, or content.</p>
+      <p>Optional columns like rating, stars, or score are used for extra visualizations.</p>
+    </section>
+  </main>
+</body>
+</html>
